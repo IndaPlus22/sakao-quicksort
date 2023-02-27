@@ -1,5 +1,6 @@
-use std::io::{stdin, Read};
 use rand::Rng;
+use std::io::{stdin, Read};
+
 
 fn main() {
     // let mut arr = input();
@@ -18,49 +19,65 @@ fn main() {
 fn tester() {
     let mut arr = Vec::new();
     let mut rng = rand::thread_rng();
-    for _ in 0..10 {
-        arr.push(rng.gen());
+    for _ in 0..100000 {
+        let eh: i32 = rng.gen();
+        arr.push(eh % 30);
     }
     let mut right_arr: Vec<i32> = arr.clone();
     right_arr.sort_unstable();
+
+    // println!("arrf: {:?}", arr);
+
     q_sort(&mut arr[..]);
 
     assert_eq!(right_arr, arr);
-    // for i in 0..arr.len() {
-    //     assert_eq!(right_arr[i], arr[i]);
-    // }
 }
 
 fn q_sort(arr: &mut [i32]) {
-    // if arr.len() < 101 {
-    //     ins_sort(arr);
-    //     return;
-    // }
+    if arr.len() < 101 {
+        ins_sort(arr);
+        return;
+    }
 
-    if arr.len() > 0 {
-        let high = arr.len();
-        let pivot_i: usize = partition(&mut arr[..high]) as usize;
+    let high = arr.len();
+    if high > 0 {
+        let pivot_i: usize = partition(&mut arr[..]) as usize;
+        // println!("");
+        
+        // println!("qarr: {:?}, pi: {}", arr, pivot_i);
         q_sort(&mut arr[..(pivot_i)]);
         q_sort(&mut arr[(pivot_i + 1)..high]);
     }
 }
 
-fn partition(arr: &mut [i32]) -> i32 {
-    let pivot = arr[pivot(arr)];
+fn partition(arr: &mut [i32]) -> usize {
+    let pivot_i = arr.len()-1;
+    let pivot = arr[arr.len() -1];
+    
+    // let pivot_i = pivot(arr);
+    // let pivot = arr[pivot_i];
 
-    let mut j: i32 = 0;
+    // println!("pivot: {}", pivot);
+
+    let mut j = 0;
     for i in 0..arr.len() {
         if arr[i] < pivot {
-            let tmp = arr[i];
-            arr[i] = arr[j as usize];
-            arr[j as usize] = tmp;
+            let tmp = arr[j];
+            arr[j] = arr[i];
+            arr[i] = tmp;
+            // println!("swapped: {} ({}) & {} ({})", arr[i], i, arr[j], j);
+            // println!("in prog: {:?}", arr);
+
             j += 1;
         }
     }
-    let tmp = arr[j as usize];
-    arr[j as usize] = arr[arr.len() - 1];
-    arr[arr.len() - 1] = tmp;
-    return j;
+
+    let tmp = arr[j];
+    arr[j] = arr[arr.len()-1];
+    arr[arr.len()-1] = tmp;
+
+    // println!("partitioned: {:?}, pi: {}", arr, j);
+    j
 }
 
 fn pivot(arr: &[i32]) -> usize {
@@ -130,5 +147,6 @@ fn test() -> Vec<i32> {
         .map(|x| x.parse().unwrap())
         .collect();
 
+    // println!("beg: {:?}", vals);
     vals
 }
