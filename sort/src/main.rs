@@ -1,5 +1,5 @@
 use rand::Rng;
-use std::io::{stdin, Read};
+use std::{io::{stdin, Read}, cmp::Ordering};
 
 
 fn main() {
@@ -19,7 +19,7 @@ fn main() {
 fn tester() {
     let mut arr = Vec::new();
     let mut rng = rand::thread_rng();
-    for _ in 0..100000 {
+    for _ in 0..10 {
         let eh: i32 = rng.gen();
         arr.push(eh % 30);
     }
@@ -34,50 +34,59 @@ fn tester() {
 }
 
 fn q_sort(arr: &mut [i32]) {
-    if arr.len() < 101 {
-        ins_sort(arr);
-        return;
-    }
+    // if arr.len() < 101 {
+    //     ins_sort(arr);
+    //     return;
+    // }
 
     let high = arr.len();
     if high > 0 {
-        let pivot_i: usize = partition(&mut arr[..]) as usize;
-        // println!("");
-        
-        // println!("qarr: {:?}, pi: {}", arr, pivot_i);
-        q_sort(&mut arr[..(pivot_i)]);
-        q_sort(&mut arr[(pivot_i + 1)..high]);
+        let pivot_low: usize = partition(&mut arr[..]).0;
+        let pivot_high: usize = partition(&mut arr[..]).1;
+
+        q_sort(&mut arr[..(pivot_low)]);
+        q_sort(&mut arr[(pivot_high + 1)..high]);
     }
 }
 
-fn partition(arr: &mut [i32]) -> usize {
-    let pivot_i = arr.len()-1;
-    let pivot = arr[arr.len() -1];
-    
-    // let pivot_i = pivot(arr);
-    // let pivot = arr[pivot_i];
+fn partition(arr: &mut [i32]) -> (usize, usize) {
+    let mut pivot_i = pivot(arr);
+    let pivot_el = arr[pivot_i];
+    println!("pivot is {}", pivot_i);
 
-    // println!("pivot: {}", pivot);
+    // start with up to pivot index
+    let mut low = 0;
+    let mut high = 0;
+    let mut dupes = 0;
+    while high < pivot_i {
+        match arr[high].cmp(&pivot_el) {
+            Ordering::Less => { // if arr[j] < pivot el
+                let tmp = arr[low];
+                arr[low] = arr[high];
+                arr[high] = tmp;
 
-    let mut j = 0;
-    for i in 0..arr.len() {
-        if arr[i] < pivot {
-            let tmp = arr[j];
-            arr[j] = arr[i];
-            arr[i] = tmp;
-            // println!("swapped: {} ({}) & {} ({})", arr[i], i, arr[j], j);
-            // println!("in prog: {:?}", arr);
+                high += 1;
+                println!("tl: {:?}, pi: {}", arr, pivot_i);
+            },
+            Ordering::Greater => {
+                println!("tg: {:?}, pi: {}", arr, pivot_i);
+            },
+            _ => {
+                // pivot_i -= 1;
+                dupes += 1;
+                println!("te: {:?}, pi: {}", arr, pivot_i);
 
-            j += 1;
+            }
         }
+        low += 1;
     }
 
-    let tmp = arr[j];
-    arr[j] = arr[arr.len()-1];
-    arr[arr.len()-1] = tmp;
+    let tmp = arr[high];
+    arr[high] = arr[pivot_i];
+    arr[pivot_i-1] = tmp;
 
-    // println!("partitioned: {:?}, pi: {}", arr, j);
-    j
+    println!("partitioned: {:?}, pi: {}", arr, pivot_i);
+    (high, high + dupes)
 }
 
 fn pivot(arr: &[i32]) -> usize {
