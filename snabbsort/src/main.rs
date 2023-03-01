@@ -69,22 +69,14 @@ fn hpartition(arr: &mut [i32]) -> usize {
     let mut hp: isize = arr.len() as isize;
 
     loop {
-        lp += 1;
-        while arr[lp as usize] < pivot_el {
+        while {
             lp += 1;
-        }
-        hp -= 1;
-        while arr[hp as usize] > pivot_el {
+            arr[lp as usize] < pivot_el
+        } {}
+        while {
             hp -= 1;
-        }
-        // while {
-        //     lp += 1;
-        //     arr[lp as usize] < pivot_el
-        // } {}
-        // while {
-        //     hp -= 1;
-        //     arr[hp] > pivot_el
-        // } {}
+            arr[hp as usize] > pivot_el
+        } {}
 
         if lp >= hp {
             return hp as usize;
