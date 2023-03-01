@@ -1,12 +1,12 @@
 use rand::Rng;
 use std::io::{stdin, Read};
 
-fn main() {
-    let mut arr = input();
-    // let mut arr = test();
 
-    // println!("arrf: {:?}", arr);
-    qsort(&mut arr[..]);
+fn main() {
+    // let mut arr = input();
+    let mut arr = test();
+
+    q_sort(&mut arr[..]);
 
     // output
     for _v in arr {
@@ -19,7 +19,7 @@ fn main() {
 fn tester() {
     let mut arr = Vec::new();
     let mut rng = rand::thread_rng();
-    for _ in 0..1000000 {
+    for _ in 0..100000 {
         let eh: i32 = rng.gen();
         arr.push(eh % 30);
     }
@@ -28,78 +28,62 @@ fn tester() {
 
     // println!("arrf: {:?}", arr);
 
-    qsort(&mut arr[..]);
+    q_sort(&mut arr[..]);
 
     assert_eq!(right_arr, arr);
 }
 
-fn qsort(arr: &mut [i32]) {
-    if arr.len() <= 1 {
-        return;
-    }
+fn q_sort(arr: &mut [i32]) {
     if arr.len() < 101 {
         ins_sort(arr);
         return;
     }
 
-    if arr.len() > 0 {
-        let pivot_i: usize = hpartition(&mut arr[..]);
-
-        // println!("qarr: {:?}, pe: {}", arr, arr[pivot_i]);
-        // println!(
-        //     "p1: {:?}, p2: {:?}",
-        //     &arr[..(pivot_i+1)],
-        //     &arr[(pivot_i + 1)..]
-        // );
+    let high = arr.len();
+    if high > 0 {
+        let pivot_i: usize = partition(&mut arr[..]) as usize;
         // println!("");
-
-        qsort(&mut arr[..(pivot_i + 1)]);
-        qsort(&mut arr[(pivot_i + 1)..]);
+        
+        // println!("qarr: {:?}, pi: {}", arr, pivot_i);
+        q_sort(&mut arr[..(pivot_i)]);
+        q_sort(&mut arr[(pivot_i + 1)..high]);
     }
 }
 
-// hoar
-fn hpartition(arr: &mut [i32]) -> usize {
-    fix_pivot(arr);
-    let pivot_el = arr[0];
-    // println!("bef par: {:?}, pe: {}", arr, pivot_el);
+fn partition(arr: &mut [i32]) -> usize {
+    let pivot_i = arr.len()-1;
+    let pivot = arr[arr.len() -1];
+    
+    // let pivot_i = pivot(arr);
+    // let pivot = arr[pivot_i];
 
-    // low pointer and high pointer
-    let mut lp: isize = -1;
-    let mut hp: isize = arr.len() as isize;
+    // println!("pivot: {}", pivot);
 
-    loop {
-        lp += 1;
-        while arr[lp as usize] < pivot_el {
-            lp += 1;
+    let mut j = 0;
+    for i in 0..arr.len() {
+        if arr[i] < pivot {
+            let tmp = arr[j];
+            arr[j] = arr[i];
+            arr[i] = tmp;
+            // println!("swapped: {} ({}) & {} ({})", arr[i], i, arr[j], j);
+            // println!("in prog: {:?}", arr);
+
+            j += 1;
         }
-        hp -= 1;
-        while arr[hp as usize] > pivot_el {
-            hp -= 1;
-        }
-        // while {
-        //     lp += 1;
-        //     arr[lp as usize] < pivot_el
-        // } {}
-        // while {
-        //     hp -= 1;
-        //     arr[hp] > pivot_el
-        // } {}
-
-        if lp >= hp {
-            return hp as usize;
-        }
-
-        arr.swap(lp as usize, hp as usize);
     }
+
+    let tmp = arr[j];
+    arr[j] = arr[arr.len()-1];
+    arr[arr.len()-1] = tmp;
+
+    // println!("partitioned: {:?}, pi: {}", arr, j);
+    j
 }
 
-
-fn fix_pivot(arr: &mut [i32]) {
+fn pivot(arr: &[i32]) -> usize {
+    let a = 0;
     let b = arr.len() / 2;
     let c = arr.len() - 1;
-
-    let mut median = 0;
 
     // a b c
     // a c b
@@ -108,21 +92,23 @@ fn fix_pivot(arr: &mut [i32]) {
     // b a c
     // b c a
     // c b a
-    if arr[0] < arr[b] {
+    if arr[a] < arr[b] {
         if arr[b] < arr[c] {
-            median = b;
-        } else if arr[0] < arr[c] {
-            median = c;
+            b
+        } else if arr[c] < arr[a] {
+            c
+        } else {
+            a
         }
     } else {
-        if arr[c] < arr[b] {
-            median = b;
-        } else if arr[c] < arr[0] {
-            median = c;
+        if arr[a] < arr[c] {
+            a
+        } else if arr[c] < arr[a] {
+            c
+        } else {
+            b
         }
     }
-
-    arr.swap(median, 0);
 }
 
 // if less than 100 just insertion sort
