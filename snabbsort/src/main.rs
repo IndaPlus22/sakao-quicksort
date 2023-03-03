@@ -37,7 +37,7 @@ fn qsort(arr: &mut [i32]) {
     if arr.len() <= 1 {
         return;
     }
-    if arr.len() < 101 {
+    if arr.len() < 100 {
         ins_sort(arr);
         return;
     }
@@ -103,17 +103,20 @@ fn fix_pivot(arr: &mut [i32]) {
     if arr[0] < arr[b] {
         if arr[b] < arr[c] {
             median = b;
+            // arr.swap(median, 0);
         } else if arr[0] < arr[c] {
             median = c;
+            // arr.swap(median, 0);
         }
     } else {
         if arr[c] < arr[b] {
             median = b;
+            // arr.swap(median, 0);
         } else if arr[c] < arr[0] {
             median = c;
+            // arr.swap(median, 0);
         }
     }
-
     arr.swap(median, 0);
 }
 
@@ -128,7 +131,7 @@ fn ins_sort(arr: &mut [i32]) {
         }
         arr[(j + 1) as usize] = old;
     }
-}
+} 
 
 // thank you jblomlof for letting me know how this kattis deals with input
 fn input() -> Vec<i32> {
